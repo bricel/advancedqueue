@@ -268,38 +268,40 @@ function advancedqueue_views_default_views() {
     3 => 0,
   );
   /* Filter criterion: Date: Date (advancedqueue) */
-  $handler->display->display_options['filters']['date_filter']['id'] = 'date_filter';
-  $handler->display->display_options['filters']['date_filter']['table'] = 'advancedqueue';
-  $handler->display->display_options['filters']['date_filter']['field'] = 'date_filter';
-  $handler->display->display_options['filters']['date_filter']['operator'] = 'between';
-  $handler->display->display_options['filters']['date_filter']['group'] = 1;
-  $handler->display->display_options['filters']['date_filter']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['date_filter']['expose']['operator_id'] = 'date_filter_op';
-  $handler->display->display_options['filters']['date_filter']['expose']['label'] = 'Created on';
-  $handler->display->display_options['filters']['date_filter']['expose']['operator'] = 'date_filter_op';
-  $handler->display->display_options['filters']['date_filter']['expose']['identifier'] = 'date_filter';
-  $handler->display->display_options['filters']['date_filter']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    25 => 0,
-    28 => 0,
-    10 => 0,
-    9 => 0,
-    22 => 0,
-    16 => 0,
-    11 => 0,
-    13 => 0,
-    19 => 0,
-    5 => 0,
-    7 => 0,
-    6 => 0,
-    4 => 0,
-    8 => 0,
-    3 => 0,
-  );
-  $handler->display->display_options['filters']['date_filter']['date_fields'] = array(
-    'advancedqueue.created' => 'advancedqueue.created',
-  );
+  if (module_exists('date_views')) {
+    $handler->display->display_options['filters']['date_filter']['id'] = 'date_filter';
+    $handler->display->display_options['filters']['date_filter']['table'] = 'advancedqueue';
+    $handler->display->display_options['filters']['date_filter']['field'] = 'date_filter';
+    $handler->display->display_options['filters']['date_filter']['operator'] = 'between';
+    $handler->display->display_options['filters']['date_filter']['group'] = 1;
+    $handler->display->display_options['filters']['date_filter']['exposed'] = TRUE;
+    $handler->display->display_options['filters']['date_filter']['expose']['operator_id'] = 'date_filter_op';
+    $handler->display->display_options['filters']['date_filter']['expose']['label'] = 'Created on';
+    $handler->display->display_options['filters']['date_filter']['expose']['operator'] = 'date_filter_op';
+    $handler->display->display_options['filters']['date_filter']['expose']['identifier'] = 'date_filter';
+    $handler->display->display_options['filters']['date_filter']['expose']['remember_roles'] = array(
+      2 => '2',
+      1 => 0,
+      25 => 0,
+      28 => 0,
+      10 => 0,
+      9 => 0,
+      22 => 0,
+      16 => 0,
+      11 => 0,
+      13 => 0,
+      19 => 0,
+      5 => 0,
+      7 => 0,
+      6 => 0,
+      4 => 0,
+      8 => 0,
+      3 => 0,
+    );
+    $handler->display->display_options['filters']['date_filter']['date_fields'] = array(
+      'advancedqueue.created' => 'advancedqueue.created',
+    );
+  }
 
   /* Display: Details Page */
   $handler = $view->new_display('page', 'Details Page', 'details_page');
@@ -534,38 +536,40 @@ function advancedqueue_views_default_views() {
       3 => 0,
     );
     /* Filter criterion: Date: Date (advancedqueue) */
-    $handler->display->display_options['filters']['date_filter']['id'] = 'date_filter';
-    $handler->display->display_options['filters']['date_filter']['table'] = 'advancedqueue';
-    $handler->display->display_options['filters']['date_filter']['field'] = 'date_filter';
-    $handler->display->display_options['filters']['date_filter']['operator'] = 'between';
-    $handler->display->display_options['filters']['date_filter']['group'] = 1;
-    $handler->display->display_options['filters']['date_filter']['exposed'] = TRUE;
-    $handler->display->display_options['filters']['date_filter']['expose']['operator_id'] = 'date_filter_op';
-    $handler->display->display_options['filters']['date_filter']['expose']['label'] = 'Created on';
-    $handler->display->display_options['filters']['date_filter']['expose']['operator'] = 'date_filter_op';
-    $handler->display->display_options['filters']['date_filter']['expose']['identifier'] = 'date_filter';
-    $handler->display->display_options['filters']['date_filter']['expose']['remember_roles'] = array(
-      2 => '2',
-      1 => 0,
-      25 => 0,
-      28 => 0,
-      10 => 0,
-      9 => 0,
-      22 => 0,
-      16 => 0,
-      11 => 0,
-      13 => 0,
-      19 => 0,
-      5 => 0,
-      7 => 0,
-      6 => 0,
-      4 => 0,
-      8 => 0,
-      3 => 0,
-    );
-    $handler->display->display_options['filters']['date_filter']['date_fields'] = array(
-      'advancedqueue.created' => 'advancedqueue.created',
-    );
+    if (module_exists('date_views')) {
+      $handler->display->display_options['filters']['date_filter']['id'] = 'date_filter';
+      $handler->display->display_options['filters']['date_filter']['table'] = 'advancedqueue';
+      $handler->display->display_options['filters']['date_filter']['field'] = 'date_filter';
+      $handler->display->display_options['filters']['date_filter']['operator'] = 'between';
+      $handler->display->display_options['filters']['date_filter']['group'] = 1;
+      $handler->display->display_options['filters']['date_filter']['exposed'] = TRUE;
+      $handler->display->display_options['filters']['date_filter']['expose']['operator_id'] = 'date_filter_op';
+      $handler->display->display_options['filters']['date_filter']['expose']['label'] = 'Created on';
+      $handler->display->display_options['filters']['date_filter']['expose']['operator'] = 'date_filter_op';
+      $handler->display->display_options['filters']['date_filter']['expose']['identifier'] = 'date_filter';
+      $handler->display->display_options['filters']['date_filter']['expose']['remember_roles'] = array(
+        2 => '2',
+        1 => 0,
+        25 => 0,
+        28 => 0,
+        10 => 0,
+        9 => 0,
+        22 => 0,
+        16 => 0,
+        11 => 0,
+        13 => 0,
+        19 => 0,
+        5 => 0,
+        7 => 0,
+        6 => 0,
+        4 => 0,
+        8 => 0,
+        3 => 0,
+      );
+      $handler->display->display_options['filters']['date_filter']['date_fields'] = array(
+        'advancedqueue.created' => 'advancedqueue.created',
+      );
+    }
     /* Filter criterion: Queue: Queue name */
     $handler->display->display_options['filters']['name_1']['id'] = 'name_1';
     $handler->display->display_options['filters']['name_1']['table'] = 'advancedqueue';
@@ -767,38 +771,40 @@ function advancedqueue_views_default_views() {
     3 => 0,
   );
   /* Filter criterion: Date: Date (advancedqueue) */
-  $handler->display->display_options['filters']['date_filter']['id'] = 'date_filter';
-  $handler->display->display_options['filters']['date_filter']['table'] = 'advancedqueue';
-  $handler->display->display_options['filters']['date_filter']['field'] = 'date_filter';
-  $handler->display->display_options['filters']['date_filter']['operator'] = 'between';
-  $handler->display->display_options['filters']['date_filter']['group'] = 1;
-  $handler->display->display_options['filters']['date_filter']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['date_filter']['expose']['operator_id'] = 'date_filter_op';
-  $handler->display->display_options['filters']['date_filter']['expose']['label'] = 'Created on';
-  $handler->display->display_options['filters']['date_filter']['expose']['operator'] = 'date_filter_op';
-  $handler->display->display_options['filters']['date_filter']['expose']['identifier'] = 'date_filter';
-  $handler->display->display_options['filters']['date_filter']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    25 => 0,
-    28 => 0,
-    10 => 0,
-    9 => 0,
-    22 => 0,
-    16 => 0,
-    11 => 0,
-    13 => 0,
-    19 => 0,
-    5 => 0,
-    7 => 0,
-    6 => 0,
-    4 => 0,
-    8 => 0,
-    3 => 0,
-  );
-  $handler->display->display_options['filters']['date_filter']['date_fields'] = array(
-    'advancedqueue.created' => 'advancedqueue.created',
-  );
+  if (module_exists('date_views')) {
+    $handler->display->display_options['filters']['date_filter']['id'] = 'date_filter';
+    $handler->display->display_options['filters']['date_filter']['table'] = 'advancedqueue';
+    $handler->display->display_options['filters']['date_filter']['field'] = 'date_filter';
+    $handler->display->display_options['filters']['date_filter']['operator'] = 'between';
+    $handler->display->display_options['filters']['date_filter']['group'] = 1;
+    $handler->display->display_options['filters']['date_filter']['exposed'] = TRUE;
+    $handler->display->display_options['filters']['date_filter']['expose']['operator_id'] = 'date_filter_op';
+    $handler->display->display_options['filters']['date_filter']['expose']['label'] = 'Created on';
+    $handler->display->display_options['filters']['date_filter']['expose']['operator'] = 'date_filter_op';
+    $handler->display->display_options['filters']['date_filter']['expose']['identifier'] = 'date_filter';
+    $handler->display->display_options['filters']['date_filter']['expose']['remember_roles'] = array(
+      2 => '2',
+      1 => 0,
+      25 => 0,
+      28 => 0,
+      10 => 0,
+      9 => 0,
+      22 => 0,
+      16 => 0,
+      11 => 0,
+      13 => 0,
+      19 => 0,
+      5 => 0,
+      7 => 0,
+      6 => 0,
+      4 => 0,
+      8 => 0,
+      3 => 0,
+    );
+    $handler->display->display_options['filters']['date_filter']['date_fields'] = array(
+      'advancedqueue.created' => 'advancedqueue.created',
+    );
+  }
   $handler->display->display_options['path'] = 'admin/reports/queue/processing';
   $handler->display->display_options['menu']['type'] = 'tab';
   $handler->display->display_options['menu']['title'] = 'Processing';

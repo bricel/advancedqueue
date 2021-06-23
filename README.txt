@@ -24,6 +24,9 @@ Note that by default the "poor-man's" processing via cron is enabled, as it
 allows site builders to start with the non-scalable and later on, more advanced
 users can disable that option via admin/config/system/cron.
 
+To use all the field and filters in the default views, Date Views (date_views)
+module should be enabled.
+
 DRUSH WORKERS
 =============
 It is possible to execute the Drush command that will loop and "listen" to
