@@ -183,6 +183,36 @@ function advancedqueue_get_queues_info($queue_names = array()) {
  *   (Optional) The time the process should end.
  */
 function advancedqueue_process_item($queue, $queue_name, $queue_info, $item, $end_time = FALSE) {
+  $params =  array(
+    '@queue' => $queue_name,
+    '@id' => $item->item_id,
+    '@title' => !empty($item->title) ? $item->title : 'untitled',
+  );
+
+  // Check we have not already reached the maximum attempts. This can happen for
+  // example if a process was stuck several times. So it was not set to failure
+  // yet, but it should eventually be, if there was no successful process.
+  $max_attempts = isset($queue_info['max attempts']) ? $queue_info['max attempts'] : 0;
+
+
+  // Backward compatibility, for before `attempt` property existed.
+  $attempt = isset($item->data['advancedqueue_attempt']) ? $item->data['advancedqueue_attempt'] : $item->attempt;
+
+  if ($max_attempts && $attempt > $max_attempts) {
+    $item->status = ADVANCEDQUEUE_STATUS_FAILURE;
+    advancedqueue_log_message(format_string('[@queue:@id] The maximum number of attempts has been reached, aborting.', $params), WATCHDOG_ERROR);
+
+    if ($queue_info['delete when completed'] && empty($item->skip_deletion)) {
+      // Item was processed, so we can "delete" it. This is not removing the
+      // item from the database, but rather updates it with the status. Both
+      // overall queues and individual items can skip the deletion process.
+      $queue->deleteItem($item);
+    }
+
+    // We have reached maximum attempts.
+    return;
+  }
+
   // First our pre-execute hook.
   if (!$queue_info['skip hooks']) {
     $hook_func = module_exists('rules') ? 'rules_invoke_all' : 'module_invoke_all';
@@ -195,11 +225,6 @@ function advancedqueue_process_item($queue, $queue_name, $queue_info, $item, $en
     // This allows worker callbacks to live outside the .module file.
     call_user_func_array('module_load_include', $queue_info['worker include']);
   }
-  $params =  array(
-    '@queue' => $queue_name,
-    '@id' => $item->item_id,
-    '@title' => !empty($item->title) ? $item->title : 'untitled',
-  );
   advancedqueue_log_message(format_string('[@queue:@id] Starting processing item @title.', $params));
 
   // Clear Drupal's static caches (including entity controllers) before
@@ -237,11 +262,10 @@ function advancedqueue_process_item($queue, $queue_name, $queue_info, $item, $en
 
   // Requeue in case of failure.
   if ($item->status == ADVANCEDQUEUE_STATUS_FAILURE_RETRY && !empty($queue_info['retry after'])) {
-    $item->data['advancedqueue_attempt'] = isset($item->data['advancedqueue_attempt']) ? $item->data['advancedqueue_attempt'] + 1 : 1;
     $item->created = time() + $queue_info['retry after'];
 
     // "max attempts" is optional, skip the attempts check if it's missing.
-    $max_attempts = isset($queue_info['max attempts']) ? $queue_info['max attempts'] : 0;
+
     if (!$max_attempts || $item->data['advancedqueue_attempt'] <= $max_attempts) {
       $queue->requeueItem($item);
       advancedqueue_log_message(format_string('[@queue:@id] failed processing and has been requeued.', $params), WATCHDOG_WARNING);
@@ -366,8 +390,6 @@ function _advancedqueue_release_stale_items($timeout) {
     ->condition('expire', $before, '<=')
     ->orderBy('name')
     ->execute();
-
-  $queues = array();
 
   // Releasing stale items to put them back in queued status.
   foreach ($items as $item) {
