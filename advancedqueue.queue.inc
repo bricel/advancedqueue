@@ -40,6 +40,11 @@ class AdvancedQueue implements DrupalReliableQueueInterface {
     $title_max = $schema['fields']['title']['length'];
     $title_raw = is_array($data) && isset($data['title']) ? $data['title'] : t('Unnamed item');
 
+
+    // If an item will be stuck in processing we want to capture the fact it was
+    // already processed.
+    $data['advancedqueue_attempt'] = 0;
+
     $fields = array(
       'name' => $this->name,
       'uid' => is_array($data) && isset($data['uid']) ? $data['uid'] : $GLOBALS['user']->uid,
@@ -84,7 +89,7 @@ class AdvancedQueue implements DrupalReliableQueueInterface {
         ':created' => time(),
         ':name' => $this->name,
       );
-      $item = db_query_range('SELECT item_id, item_key, created, uid, title, data FROM {advancedqueue} q WHERE status = -1 AND expire = 0 AND name = :name AND created <= :created ORDER BY created ASC', 0, 1, $data)->fetchObject();
+      $item = db_query_range('SELECT item_id, item_key, created, uid, title, attempt, data FROM {advancedqueue} q WHERE status = -1 AND expire = 0 AND name = :name AND created <= :created ORDER BY created ASC', 0, 1, $data)->fetchObject();
       if ($item) {
         // Try to update the item. Only one thread can succeed in UPDATEing the
         // same row. We cannot rely on REQUEST_TIME because items might be
@@ -92,16 +97,36 @@ class AdvancedQueue implements DrupalReliableQueueInterface {
         // continue to use REQUEST_TIME instead of the current time(), we steal
         // time from the lease, and will tend to reset items before the lease
         // should really expire.
+
+        $item->data = unserialize($item->data);
+
+        $fields = array(
+          'status' => ADVANCEDQUEUE_STATUS_PROCESSING,
+          'expire' => time() + $lease_time,
+        );
+
+        if (isset($item->data['advancedqueue_attempt'])) {
+          // Backward compatibility, for before `attempt` property existed.
+          // Remove the property from data, in favor of the `attempt` property.
+          $attempt = $item->data['advancedqueue_attempt'];
+          unset($item->data['advancedqueue_attempt']);
+
+          $fields['data'] = serialize($item->data);
+        }
+        else {
+          $attempt = $item->attempt;
+        }
+
+        $item->attempt = $attempt + 1;
+        $fields['attempt'] = $item->attempt;
+
         $update = db_update('advancedqueue')
-          ->fields(array(
-            'status' => ADVANCEDQUEUE_STATUS_PROCESSING,
-            'expire' => time() + $lease_time,
-          ))
+          ->fields($fields)
           ->condition('item_id', $item->item_id)
           ->condition('expire', 0);
+
         // If there are affected rows, this update succeeded.
         if ($update->execute()) {
-          $item->data = unserialize($item->data);
           return $item;
         }
       }
