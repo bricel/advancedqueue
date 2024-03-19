@@ -93,6 +93,8 @@ function drush_advancedqueue_process_queue($queue_args = NULL) {
   drush_log(dt('Starting processing loop.'));
 
   while (!$end || time() < $end) {
+    // TODO: this is realy bad because we have many queue type and 4 AQ running
+    // so it flood select query for AQ 8k per minutes query at peak.
     foreach ($queues as $queue_name => $queue_info) {
       $queue = DrupalQueue::get($queue_name);
 
