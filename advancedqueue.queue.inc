@@ -79,7 +79,29 @@ class AdvancedQueue implements DrupalReliableQueueInterface {
     return db_query('SELECT COUNT(item_id) FROM {advancedqueue} WHERE name = :name AND status <= 0', array(':name' => $this->name))->fetchField();
   }
 
-  public function claimItem($lease_time = 30) {
+  /**
+   * Check if there are any items in the queue.
+   *
+   * @param $queue_names
+   *  An array of queue names to check.
+   *
+   * @return void
+   */
+  public static function checkQueues($queue_names) {
+    $query = db_select('advancedqueue', 'q')
+      ->fields('q', ['name', 'item_id', 'item_key', 'created', 'uid', 'title', 'attempt', 'data'])
+      ->condition('status', -1)
+      ->condition('expire', 0)
+      ->condition('name', $queue_names, 'IN')
+      ->condition('created', time(), '<=')
+      ->orderBy('created', 'ASC')
+      ->range(0, 1);
+
+    // Execute the query
+    return $query->execute()->fetchObject();
+  }
+
+  public function claimItem($lease_time = 30, $item = FALSE) {
     // Claim an item by updating its expire fields. If claim is not successful
     // another thread may have claimed the item in the meantime. Therefore loop
     // until an item is successfully claimed or we are reasonably sure there
@@ -89,7 +111,10 @@ class AdvancedQueue implements DrupalReliableQueueInterface {
         ':created' => time(),
         ':name' => $this->name,
       );
-      $item = db_query_range('SELECT item_id, item_key, created, uid, title, attempt, data FROM {advancedqueue} q WHERE status = -1 AND expire = 0 AND name = :name AND created <= :created ORDER BY created ASC', 0, 1, $data)->fetchObject();
+      // If we get the item from signature, no need to look for one.
+      if (empty($item)) {
+        $item = db_query_range('SELECT item_id, item_key, created, uid, title, attempt, data FROM {advancedqueue} q WHERE status = -1 AND expire = 0 AND name = :name AND created <= :created ORDER BY created ASC', 0, 1, $data)->fetchObject();
+      }
       if ($item) {
         // Try to update the item. Only one thread can succeed in UPDATEing the
         // same row. We cannot rely on REQUEST_TIME because items might be

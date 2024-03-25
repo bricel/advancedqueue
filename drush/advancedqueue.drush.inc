@@ -93,12 +93,16 @@ function drush_advancedqueue_process_queue($queue_args = NULL) {
   drush_log(dt('Starting processing loop.'));
 
   while (!$end || time() < $end) {
-    foreach ($queues as $queue_name => $queue_info) {
+    // Look for new items to process.
+    $next_item = AdvancedQueue::checkQueues(array_keys($queues));
+    if (!empty($next_item)) {
+      $queue_name = $next_item->name;
+      $queue_info = $queues[$queue_name];
       $queue = DrupalQueue::get($queue_name);
 
-      if ($item = $queue->claimItem($queue_info['lease time'])) {
+      if ($item = $queue->claimItem($queue_info['lease time'], $next_item)) {
         advancedqueue_process_item($queue, $queue_name, $queue_info, $item, $end);
-        continue 2;
+        continue;
       }
     }
 
