@@ -19,6 +19,15 @@ class AdvancedQueue implements DrupalReliableQueueInterface {
     $this->name = $name;
   }
 
+  /**
+   * Create an advancedqueue item.
+   *
+   * @param array $data
+   *   The data for the queue item.
+   *
+   * @return int
+   *   ID of the created item.
+   */
   public function createItem($data) {
     return $this->createUniqueItem($data);
   }
@@ -33,6 +42,9 @@ class AdvancedQueue implements DrupalReliableQueueInterface {
    * @param bool $overwrite
    *   Whether the new item should replace the old item in the queue. Defaults
    *   to TRUE. Used for queue-but-don't-replace-existing logic.
+   *
+   * @return int
+   *   ID of the created item.
    */
   public function createUniqueItem($data, $key = NULL) {
     // Make sure that queue items cannot break the title column.
@@ -62,17 +74,24 @@ class AdvancedQueue implements DrupalReliableQueueInterface {
       // that if "created" is set into the future and an item is updated too
       // frequently, it might never get to run. Be careful!
       $fields['item_key'] = $key;
-      $query = db_merge('advancedqueue')
+      db_merge('advancedqueue')
         ->key(array('item_key' => $key))
-        ->fields($fields);
+        ->fields($fields)
+        ->execute();
+
+      // Find the item_id of the merged item.
+      return db_select('advancedqueue', 'aq')
+        ->condition('item_key', $key)
+        ->fields('aq', ['item_id'])
+        ->execute()
+        ->fetchField();
     }
     else {
       // No key means just insert a new item!
-      $query = db_insert('advancedqueue')
-        ->fields($fields);
+      return db_insert('advancedqueue')
+        ->fields($fields)
+        ->execute();
     }
-
-    return (bool) $query->execute();
   }
 
   public function numberOfItems() {
