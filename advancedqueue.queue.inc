@@ -93,8 +93,9 @@ class AdvancedQueue implements DrupalReliableQueueInterface {
       ->condition('status', -1)
       ->condition('expire', 0)
       ->condition('name', $queue_names, 'IN')
+      // Since we can have futuristic tasks.
       ->condition('created', time(), '<=')
-      ->orderBy('created', 'ASC')
+      ->orderBy('created')
       ->range(0, 1);
 
     // Execute the query
