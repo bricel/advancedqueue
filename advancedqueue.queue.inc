@@ -74,6 +74,29 @@ class AdvancedQueue implements DrupalReliableQueueInterface {
     return db_query('SELECT COUNT(item_id) FROM {advancedqueue} WHERE name = :name AND status <= 0', array(':name' => $this->name))->fetchField();
   }
 
+  /**
+   * Check if there are any items waiting to be processed in the queue.
+   *
+   * @param $queue_names
+   *  An array of queue names to check.
+   *
+   * @return object
+   *  The first item that is available to be processed.
+   */
+  public static function checkQueues($queue_names) {
+    $query = db_select('advancedqueue', 'q')
+      ->fields('q', ['name', 'item_id', 'item_key', 'created', 'uid', 'title', 'attempt', 'data'])
+      ->condition('status', -1)
+      ->condition('expire', 0)
+      ->condition('name', $queue_names, 'IN')
+      // Since we can have futuristic tasks.
+      ->condition('created', time(), '<=')
+      ->orderBy('created')
+      ->range(0, 1);
+
+     return $query->execute()->fetchObject();
+  }
+
   public function claimItem($lease_time = 30) {
     // Claim an item by updating its expire fields. If claim is not successful
     // another thread may have claimed the item in the meantime. Therefore loop
