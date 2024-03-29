@@ -55,7 +55,9 @@ class AdvancedQueue implements DrupalReliableQueueInterface {
 
     // If an item will be stuck in processing we want to capture the fact it was
     // already processed.
-    $data['advancedqueue_attempt'] = 0;
+    if (is_array($data)) {
+      $data['advancedqueue_attempt'] = 0;
+    }
 
     $fields = array(
       'name' => $this->name,
