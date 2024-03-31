@@ -145,7 +145,7 @@ class AdvancedQueue implements DrupalReliableQueueInterface {
         // time from the lease, and will tend to reset items before the lease
         // should really expire.
 
-        $item->data = unserialize($item->data);
+        $item->data = !is_array( $item->data) ? unserialize($item->data) : $item->data;
 
         $fields = array(
           'status' => ADVANCEDQUEUE_STATUS_PROCESSING,
