@@ -246,6 +246,7 @@ function advancedqueue_process_item($queue, $queue_name, $queue_info, $item, $en
   }
   catch (Exception $e) {
     $item->status = ADVANCEDQUEUE_STATUS_FAILURE;
+    $item->result = (string) $e;
     $params['!message'] = (string) $e;
     advancedqueue_log_message(format_string('[@queue:@id] failed processing: !message', $params), WATCHDOG_ERROR);
   }
