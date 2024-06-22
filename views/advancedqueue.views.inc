@@ -174,6 +174,24 @@ function advancedqueue_views_data() {
     ),
   );
 
+$data['advancedqueue']['attempt'] = array(
+    'title' => t('Attempt'),
+    'help' => t('The number of times the item has been attempted.'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),
+  );
+
   $data['advancedqueue_tags']['table']['group']  = t('Queue');
 
   $data['advancedqueue_tags']['table']['join'] = array(
